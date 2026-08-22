@@ -1,0 +1,13 @@
+/* Dino color tokens, footprints, claws, horns, and illustration treatment */
+:root{--ink:#173b39;--muted:#52706c;--green:#2f9b6f;--dark:#17624b;--lime:#d6ed75;--sun:#ffd65a;--coral:#f47e60;--sky:#dff4f4;--paper:#fffef8;--line:#d6e4df;--shadow:0 12px 30px rgba(23,59,57,.12);--world:#2f9b6f}
+.app:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.18;background-image:url('../images/ui/footprint-trail.svg');background-size:94px 94px;transform:rotate(-8deg) scale(1.1)}
+.dino-claws{position:absolute;left:5%;bottom:13px;display:flex;gap:14px;opacity:.42;transform:rotate(-8deg)}
+.claw{position:relative;width:40px;height:22px;border:5px solid #fff2ad;border-top:0;border-radius:0 0 50% 50%;filter:drop-shadow(0 3px 0 rgba(0,0,0,.14))}
+.claw:before,.claw:after{content:"";position:absolute;top:-11px;width:10px;height:19px;border:4px solid #fff2ad;border-bottom:0;border-radius:70% 70% 0 0}
+.claw:before{left:1px;transform:rotate(-18deg)}
+.claw:after{right:1px;transform:rotate(18deg)}
+.horn-row{position:absolute;right:8%;top:16px;display:flex;gap:9px;opacity:.45}
+.horn{width:0;height:0;border-left:11px solid transparent;border-right:11px solid transparent;border-bottom:34px solid #fff7c5;transform:rotate(12deg)}
+.horn:nth-child(2){transform:rotate(-12deg) scale(.75)}
+
+.dino-art{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}.hero-dino .dino-art{width:min(280px,70vw);height:auto;filter:drop-shadow(0 12px 0 rgba(0,0,0,.12))}.world-dino{width:78px;height:66px}.world-id .big-dino{width:74px;height:62px}.world-id .big-dino .dino-art{filter:drop-shadow(0 4px 0 rgba(0,0,0,.12))}
