@@ -1,0 +1,14 @@
+{
+  "scope": "Grades 1–3 mathematics and reasoning",
+  "numberLimits": { "easy": 20, "medium": 50, "hard": 99 },
+  "worlds": [
+    { "id": "counting", "grades": [1, 2], "topics": ["counting", "skip counting", "place value", "compare and order"] },
+    { "id": "addition", "grades": [1, 2, 3], "topics": ["addition", "missing addends", "regrouping"] },
+    { "id": "subtraction", "grades": [1, 2, 3], "topics": ["subtraction", "unknowns", "regrouping"] },
+    { "id": "patterns", "grades": [1, 2, 3], "topics": ["repeating patterns", "number sequences", "odd and even"] },
+    { "id": "measure", "grades": [1, 2, 3], "topics": ["time", "money", "length"] },
+    { "id": "shapes", "grades": [1, 2, 3], "topics": ["shape properties", "fractions", "area", "perimeter"] },
+    { "id": "multiplication", "grades": [2, 3], "topics": ["equal groups", "arrays", "multiplication", "division"] },
+    { "id": "reasoning", "grades": [2, 3], "topics": ["two-step problems", "estimation", "rounding", "logic"] }
+  ]
+}
