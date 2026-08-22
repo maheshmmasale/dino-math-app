@@ -1,0 +1,12 @@
+export const worlds = [
+  {id:'counting',name:'Dino Counting Valley',dino:'🦕',dinoName:'Brontosaurus',image:'assets/images/dinos/bronto.svg',icon:'🐾',roar:'Bronto deep hum',color:'#2f9b6f',grades:'Grades 1–2',skills:'counting, place value, comparing & ordering',short:'Count by 2s, 5s and 10s. Build numbers with tens and ones.'},
+  {id:'addition',name:'Addition Volcano',dino:'🦖',dinoName:'Tyrannosaurus rex',image:'assets/images/dinos/trex.svg',icon:'🌋',roar:'T-Rex mighty roar',color:'#db6549',grades:'Grades 1–3',skills:'addition, missing addends & regrouping',short:'Join egg groups, find missing parts, and add numbers below 100.'},
+  {id:'subtraction',name:'Subtraction Swamp',dino:'🦏',dinoName:'Triceratops',image:'assets/images/dinos/triceratops.svg',icon:'🦴',roar:'Triceratops trumpet',color:'#3c8871',grades:'Grades 1–3',skills:'subtraction, unknowns & regrouping',short:'Take away, compare what remains, and solve mystery numbers.'},
+  {id:'patterns',name:'Pattern Jungle',dino:'🦎',dinoName:'Velociraptor',image:'assets/images/dinos/raptor.svg',icon:'🖐️',roar:'Raptor chirp',color:'#7c8d32',grades:'Grades 1–3',skills:'patterns, odd/even & sequences',short:'Spot repeating rules, skip-count, and identify odd or even.'},
+  {id:'measure',name:'Measure Mountain',dino:'🦕',dinoName:'Stegosaurus',image:'assets/images/dinos/stego.svg',icon:'⛰️',roar:'Stego thump',color:'#3984a7',grades:'Grades 1–3',skills:'time, money & length',short:'Read clocks, count coins, and compare centimeters and inches.'},
+  {id:'shapes',name:'Shape Canyon',dino:'🦖',dinoName:'Pterodactyl',image:'assets/images/dinos/pterodactyl.svg',icon:'🦷',roar:'Pterodactyl screech',color:'#bd7142',grades:'Grades 1–3',skills:'shapes, fractions, area & perimeter',short:'Explore corners, equal parts, rectangles, area and perimeter.'},
+  {id:'multiplication',name:'Multiplication Plains',dino:'🦕',dinoName:'Ankylosaurus',image:'assets/images/dinos/ankylo.svg',icon:'🦴',roar:'Ankylosaurus stomp-roar',color:'#9b7729',grades:'Grades 2–3',skills:'arrays, multiplication & sharing',short:'Make equal groups, build arrays, multiply and divide.'},
+  {id:'reasoning',name:'Reasoning Reef',dino:'🐊',dinoName:'Mosasaurus',image:'assets/images/dinos/mosasaurus.svg',icon:'🦖',roar:'Mosasaurus splash-roar',color:'#287fa0',grades:'Grades 2–3',skills:'two-step stories, rounding & logic',short:'Plan two steps, estimate wisely, and crack number puzzles.'}
+];
+
+export const limits = { easy: 20, medium: 50, hard: 99 };
