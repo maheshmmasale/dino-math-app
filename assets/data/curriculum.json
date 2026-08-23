@@ -1,6 +1,12 @@
 {
   "scope": "Kindergarten through Grade 3 mathematics and reasoning",
   "numberLimits": { "kindergarten": 20, "grade1": 20, "grade2": 50, "grade3": 99 },
+  "standardsByGrade": {
+    "kindergarten": ["K.CC", "K.OA", "K.MD", "K.G"],
+    "grade1": ["1.OA", "1.NBT", "1.MD", "1.G"],
+    "grade2": ["2.OA", "2.NBT", "2.MD", "2.G"],
+    "grade3": ["3.OA", "3.NBT", "3.NF", "3.MD", "3.G"]
+  },
   "kindergarten": {
     "standards": ["K.CC", "K.OA", "K.MD", "K.G"],
     "challengeCount": 20,
