@@ -1,4 +1,4 @@
-const roarFiles = [
+export const roarFiles = [
   '../sounds/roars/bronto-hum.mp3',
   '../sounds/roars/trex-roar.mp3',
   '../sounds/roars/tricera-trumpet.mp3',
@@ -8,7 +8,7 @@ const roarFiles = [
   '../sounds/roars/ankylo-stomp.mp3',
   '../sounds/roars/mosa-splash.mp3'
 ];
-const effectFiles = {
+export const AUDIO_VOLUME = 0.8; const effectFiles = {
   crack: '../sounds/fx/egg-crack.mp3',
   boom: '../sounds/fx/volcano-boom.mp3',
   correct: '../sounds/fx/correct-chime.mp3',
@@ -21,7 +21,7 @@ const makeAudio = (path) => {
   const resolved = new URL(path, import.meta.url).href;
   const element = new Audio(resolved);
   element.preload = 'auto';
-  element.volume = 0.8;
+  element.volume = AUDIO_VOLUME;
   element.dataset.source = resolved;
   element.load();
   return element;
@@ -112,7 +112,7 @@ function playElement(element, onFailure) {
   try {
     element.pause();
     element.currentTime = 0;
-    element.volume = 0.8;
+    element.volume = AUDIO_VOLUME;
     const promise = element.play();
     if (promise) promise.catch(fail);
   } catch (error) { fail(error); }
@@ -140,8 +140,8 @@ export function playWorldRoar(worldIndex) {
   }
   playElement(roar, () => synthRoar(worldIndex));
 
-export { roarFiles };
-export const AUDIO_VOLUME = 0.8;
+
+
 }
 
 export function playCorrectCelebration(worldIndex) {
