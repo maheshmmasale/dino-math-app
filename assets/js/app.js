@@ -1,5 +1,5 @@
 import { worlds } from './worlds.js';
-import { makeProblem } from './problems.js';
+import { isCorrectAnswer, makeProblem } from './problems.js';
 import { session } from './storage.js';
 import { playEffect, playWorldRoar, playCorrectCelebration, setSound, unlockAudio } from './audio.js';
 import { setupVoices, speakStoryText, stopSpeaking, speechSupported } from './tts.js';
@@ -29,7 +29,7 @@ app.innerHTML = `
 
     <section class="map-section" id="worlds" aria-labelledby="worldsTitle">
       <div class="section-head"><div><h2 id="worldsTitle">Choose a dino world</h2><p>Each world makes unlimited new stories and questions.</p></div><div class="difficulty" aria-label="Choose level"><button type="button" data-difficulty="kindergarten" aria-pressed="true">Kindergarten</button><button type="button" data-difficulty="easy" aria-pressed="false">Grade 1</button><button type="button" data-difficulty="medium" aria-pressed="false">Grade 2</button><button type="button" data-difficulty="hard" aria-pressed="false">Grade 3</button></div></div>
-      <details class="kindergarten-guide" id="kindergartenGuide" open><summary>All 20 Kindergarten challenges</summary><ol><li>Count dinos to 10 and count to 20</li><li>Recognize numbers 0–20</li><li>Match one dino to each count</li><li>Trace and write numbers 0–20</li><li>Compare more, less, or equal</li><li>Add dino eggs within 5</li><li>Subtract dinos within 5</li><li>Break apart numbers to 10</li><li>Make 10 with dino friends</li><li>Name 2D shapes</li><li>Sort by color, size, or type</li><li>Continue AB patterns</li><li>Compare length, height, and weight</li><li>Use position words</li><li>Explore 3D shapes</li><li>Count dino stomps by tens</li><li>Put numbers 0–20 in order</li><li>Make equal groups; meet odd and even</li><li>Solve story problems within 10</li><li>Fill ten-frames with dino eggs</li></ol></details>
+      <details class="kindergarten-guide" id="kindergartenGuide" open><summary>All 20 Kindergarten challenges</summary><ol><li>Count dinos to 10 and count to 20</li><li>Recognize numbers 0–20</li><li>Match one dino to each count</li><li>Trace and write numbers 0–20</li><li>Compare more, less, or equal</li><li>Add dino eggs within 5</li><li>Subtract dinos within 5</li><li>Break apart numbers to 10</li><li>Make 10 with dino friends</li><li>Name 2D shapes</li><li>Sort by color, size, or type</li><li>Continue AB patterns</li><li>Compare length, height, and weight</li><li>Use position words</li><li>Explore 3D shapes</li><li>Count dino stomps by twos to 20</li><li>Put numbers 0–20 in order</li><li>Make equal groups; meet odd and even</li><li>Solve story problems within 10</li><li>Fill ten-frames with dino eggs</li></ol></details>
       <div class="world-map" id="worldMap"></div>
     </section>
 
@@ -44,7 +44,7 @@ app.innerHTML = `
     </section>
 
     <section class="badge-shelf" aria-labelledby="badgesTitle"><h2 id="badgesTitle">Dino badge shelf</h2><div class="badges" id="badges"></div></section>
-    <p class="parent-note">Grown-ups: Kindergarten focuses on 0–20 (plus counting by tens to 100), then Grades 1–3 use numbers below 100. Story voice is optional; questions and answers are never read aloud. Stars and badges last only while this page stays open.</p>
+    <p class="parent-note">Grown-ups: Kindergarten focuses on 0–20, then Grades 1–3 use numbers below 100. Story voice is optional; questions and answers are never read aloud. Stars and badges last only while this page stays open.</p>
   </main>
   <div class="burst" id="burst" aria-hidden="true"></div>`;
 
@@ -64,7 +64,7 @@ const kindergartenWorldSkills = [
   'Sort by color, size, and type · continue AB patterns · meet odd and even.',
   'Compare longer, taller, and heavier · use above, below, front, and behind.',
   'Name circles, squares, triangles, rectangles, and hexagons · explore 3D shapes.',
-  'Build equal groups · count dino stomps by tens to 100.',
+  'Build equal groups · count dino stomps by twos to 20.',
   'Match one dino to one count · reason through number stories and ten-frames.'
 ];
 
@@ -144,7 +144,7 @@ function revealQuestion() {
 function answerQuestion(button) {
   if (state.answered) return;
   unlockAudio();
-  const correct = button.dataset.answer === state.problem.correct;
+  const correct = isCorrectAnswer(state.problem, button.dataset.answer);
   if (correct) {
     state.answered = true;
     button.classList.add('correct');

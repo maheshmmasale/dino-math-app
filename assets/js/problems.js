@@ -12,12 +12,18 @@ const maxForLevel = (level) => [20, 50, 99][level - 1];
 
 function optionSet(correct, others, difficulty) {
   const limit = limits[difficulty];
-  const number = Number(correct);
-  const numeric = Number.isFinite(number);
-  let pool = numeric ? others.filter((value) => Number(value) >= 0 && Number(value) <= limit) : others;
+  const numericMatch = String(correct).match(/^(\d+)(\s*(?:¢|cm|in|units|square units))?$/);
+  const numeric = Boolean(numericMatch);
+  const suffix = numericMatch?.[2] || '';
+  const pool = numeric
+    ? others.filter((value) => {
+      const match = String(value).match(/^(\d+)(\s*(?:¢|cm|in|units|square units))?$/);
+      return match && Number(match[1]) >= 0 && Number(match[1]) <= limit;
+    })
+    : others;
   const values = [String(correct), ...pool.map(String)].filter((value, index, all) => all.indexOf(value) === index);
   while (values.length < 4) {
-    const next = numeric ? rand(0, limit) : pick(['Not enough clues', 'Both', 'Neither', 'It stays the same']);
+    const next = numeric ? `${rand(0, limit)}${suffix}` : pick(['Not enough clues', 'Both', 'Neither', 'It stays the same']);
     if (!values.includes(String(next))) values.push(String(next));
   }
   return shuffle(values.slice(0, 4));
@@ -205,7 +211,7 @@ const kindergartenChallenges = [
       { name: 'Circle', symbol: '●', sides: 0 }, { name: 'Square', symbol: '■', sides: 4 }, { name: 'Triangle', symbol: '▲', sides: 3 }, { name: 'Rectangle', symbol: '▬', sides: 4 }, { name: 'Hexagon', symbol: '⬢', sides: 6 }
     ];
     const shape = pick(shapes);
-    return problem({ title: `Perry sees a ${shape.name.toLowerCase()}-shaped footprint stamped beside the canyon. He circles it in the sky with his wings!`, teach: `${shape.name}s have ${shape.sides === 0 ? 'one curved edge and no straight sides' : `${shape.sides} straight sides`}.` }, 'What shape is the footprint?', shape.name, shuffle([shape.name, ...shapes.filter((item) => item.name !== shape.name).map((item) => item.name)]).slice(0, 4), row([`<span class="shape-mark">${shape.symbol}</span>`]), '2D shapes');
+    return problem({ title: `Perry sees a ${shape.name.toLowerCase()}-shaped footprint stamped beside the canyon. He circles it in the sky with his wings!`, teach: `${shape.name}s have ${shape.sides === 0 ? 'one curved edge and no straight sides' : `${shape.sides} straight sides`}.` }, 'What shape is the footprint?', shape.name, optionSet(shape.name, shapes.filter((item) => item.name !== shape.name).map((item) => item.name), 'kindergarten'), row([`<span class="shape-mark">${shape.symbol}</span>`]), '2D shapes');
   },
   () => {
     const sets = [
@@ -249,10 +255,10 @@ const kindergartenChallenges = [
     return problem({ title: `Annie tests a ${shape.name.toLowerCase()} dino toy on the play table. She nudges it gently with her club tail.`, teach: `A ${shape.name.toLowerCase()} can ${shape.action}.` }, 'Which 3D shape is shown?', shape.name, shuffle([shape.name, ...shapes.filter((item) => item.name !== shape.name).map((item) => item.name)]).slice(0, 4), row([`<span class="shape-mark">${shape.symbol}</span>`]), '3D shapes: roll, stack, slide');
   },
   () => {
-    const stop = rand(3, 10), answer = stop * 10;
-    const seq = Array.from({ length: stop }, (_, index) => (index + 1) * 10);
-    const otherTens = shuffle(Array.from({ length: 10 }, (_, index) => (index + 1) * 10).filter((value) => value !== answer)).slice(0, 3);
-    return problem({ title: `Bindi makes one giant stomp for every group of ten. The ground goes boom, boom, boom—but the eggs stay safe!`, teach: 'Count by tens: each stomp adds 10.' }, `What number comes after ${answer - 10}?`, answer, shuffle([answer, ...otherTens]), row(seq.slice(Math.max(0, seq.length - 5)).map(token).concat(token('?'))), 'Count by tens to 100');
+    const stop = rand(2, 10), answer = stop * 2;
+    const seq = Array.from({ length: stop }, (_, index) => (index + 1) * 2);
+    const otherEvens = shuffle(Array.from({ length: 10 }, (_, index) => (index + 1) * 2).filter((value) => value !== answer)).slice(0, 3);
+    return problem({ title: `Bindi makes one giant stomp for every pair of eggs. The ground goes boom, boom, boom—but the eggs stay safe!`, teach: 'Count by twos: each stomp adds 2.' }, `What number comes after ${answer - 2}?`, answer, shuffle([answer, ...otherEvens]), row(seq.slice(Math.max(0, seq.length - 5)).map(token).concat(token('?'))), 'Count by twos to 20');
   },
   () => {
     const middle = rand(1, 19);
@@ -273,6 +279,8 @@ const kindergartenChallenges = [
   }
 ];
 
+export const KINDERGARTEN_CHALLENGE_COUNT = kindergartenChallenges.length;
+
 let kindergartenDeck = [];
 function kindergarten() {
   if (!kindergartenDeck.length) kindergartenDeck = shuffle(kindergartenChallenges.map((_, index) => index));
@@ -284,4 +292,8 @@ export function makeProblem(worldIndex, difficulty) {
   if (difficulty === 'kindergarten') return kindergarten();
   const level = { easy: 1, medium: 2, hard: 3 }[difficulty];
   return generators[worldIndex](level, difficulty);
+}
+
+export function isCorrectAnswer(problemToCheck, answer) {
+  return String(answer) === String(problemToCheck.correct);
 }
