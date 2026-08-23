@@ -1,32 +1,40 @@
 const supported = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
 let selectedVoice = null;
 
+const preferredNames = [
+  /Google US English.*Female/i,
+  /^Samantha$/i,
+  /^Karen$/i,
+  /^Ava/i,
+  /^Zira/i,
+  /female/i
+];
+
 export function refreshVoices() {
   if (!supported) return;
   const voices = window.speechSynthesis.getVoices();
   const english = voices.filter((voice) => /^en/i.test(voice.lang));
-  selectedVoice = english.find((voice) => /Samantha|Zira|Ava|Google US English|female/i.test(voice.name)) || english[0] || voices[0] || null;
+  selectedVoice = preferredNames.reduce((match, pattern) => match || english.find((voice) => pattern.test(voice.name)), null)
+    || english.find((voice) => voice.localService)
+    || english[0]
+    || voices[0]
+    || null;
 }
 
-export function mathSpeech(text) {
+function storySpeech(text) {
   return String(text)
-    .replaceAll('×', ' times ')
-    .replaceAll('÷', ' divided by ')
-    .replaceAll('−', ' minus ')
-    .replaceAll('+', ' plus ')
-    .replaceAll('=', ' equals ')
-    .replaceAll('≈', ' about ')
-    .replace(/(\d+)\/(\d+)/g, '$1 out of $2')
-    .replace(/¢/g, ' cents')
+    .replace(/([.!?])\s+/g, '$1,   ')
+    .replace(/…/g, ',   ')
+    .replace(/\b(ROAR|Roar)\b/g, 'roooar')
     .replace(/[🦕🦖🦏🦎🐊🖐️🐾🦴🥚🦷📯🪽🪺🍪🌋💦]/gu, ' ');
 }
 
-export function speak(text) {
+export function speakStoryText(text) {
   if (!supported) return false;
   window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(mathSpeech(text));
-  utterance.rate = 0.9;
-  utterance.pitch = 1.1;
+  const utterance = new SpeechSynthesisUtterance(storySpeech(text));
+  utterance.rate = 0.87;
+  utterance.pitch = 1.05;
   utterance.volume = 1;
   if (selectedVoice) utterance.voice = selectedVoice;
   window.speechSynthesis.speak(utterance);
@@ -42,6 +50,10 @@ export function setupVoices() {
   refreshVoices();
   window.speechSynthesis.onvoiceschanged = refreshVoices;
   return true;
+}
+
+export function voiceLabel() {
+  return selectedVoice ? `Teacher Maya, using ${selectedVoice.name}` : 'Teacher Maya';
 }
 
 export const speechSupported = supported;

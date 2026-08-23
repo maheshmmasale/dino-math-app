@@ -1,7 +1,7 @@
 // Session-only progress. It intentionally resets on reload because this static app has no durable backend.
 const progress = {
   world: 0,
-  difficulty: 'easy',
+  difficulty: 'kindergarten',
   round: 0,
   stars: 0,
   roundCorrect: 0,
@@ -9,8 +9,7 @@ const progress = {
   problem: null,
   answered: false,
   sound: true,
-  jungle: false,
-  readAloud: false
+  storyVoice: true
 };
 
 export const session = {

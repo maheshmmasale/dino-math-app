@@ -1,8 +1,8 @@
 import { worlds } from './worlds.js';
 import { makeProblem } from './problems.js';
 import { session } from './storage.js';
-import { playEffect, playWorldRoar, playCelebration, setBeats, setSound } from './audio.js';
-import { setupVoices, speak, stopSpeaking, speechSupported } from './tts.js';
+import { playEffect, playWorldRoar, playCorrectCelebration, setSound, unlockAudio } from './audio.js';
+import { setupVoices, speakStoryText, stopSpeaking, speechSupported } from './tts.js';
 import { confettiColors, effectForWorld } from '../animations/effects.js';
 
 const app = document.querySelector('#app');
@@ -11,24 +11,25 @@ app.innerHTML = `
     <div class="toolbar">
       <div class="session-score" aria-live="polite"><span aria-hidden="true">⭐</span><span id="starCount">0 stars this safari</span></div>
       <div class="tool-group">
-        <button class="tool-btn" id="jungleToggle" type="button" aria-pressed="false" aria-label="Turn dino beats on"><span class="tool-icon" aria-hidden="true">🦴</span><span>Dino beats off</span></button>
-        <button class="tool-btn" id="soundToggle" type="button" aria-pressed="true" aria-label="Turn sounds off"><span class="tool-icon" aria-hidden="true">🔊</span><span>Sounds on</span></button>
-        <button class="tool-btn" id="readToggle" type="button" aria-pressed="false" aria-label="Turn read aloud on"><span class="tool-icon" aria-hidden="true">🔊</span><span>Read Aloud</span></button>
+        <button class="tool-btn" id="soundToggle" type="button" aria-pressed="true" aria-label="Turn dinosaur roars and effects off"><span class="tool-icon" aria-hidden="true">🔊</span><span>Roars &amp; FX on</span></button>
+        <button class="tool-btn" id="storyVoiceToggle" type="button" aria-pressed="true" aria-label="Turn Teacher Maya story voice off"><span class="tool-icon" aria-hidden="true">🎙️</span><span>Teacher Maya on</span></button>
+        <details class="voice-settings"><summary>Voice settings</summary><div class="voice-panel"><strong>Teacher Maya · warm female</strong><p>Inspired by gentle toddler teachers like Ms Rachel — slow, clear, and encouraging. This is not a clone of any real person. Voice is used only when you tap <b>Hear Story</b>.</p><small>Teacher Maya uses the best warm English voice installed in this browser. A future server-backed edition could support a high-quality TTS provider with your own API key.</small></div></details>
       </div>
     </div>
 
     <section class="hero" aria-labelledby="heroTitle">
       <div class="hero-copy">
-        <span class="eyebrow">Grades 1–3 · Eight giant worlds</span>
+        <span class="eyebrow">Kindergarten–Grade 3 · Eight giant worlds</span>
         <h1 id="heroTitle">Your dino math adventure keeps growing.</h1>
-        <p>Hear a dinosaur story, discover the math clue, then tackle a quick four-question egg hunt. Every visit creates new challenges.</p>
+        <p>Choose Kindergarten or Grades 1–3, hear a dinosaur story when you want, then tackle a quick four-question egg hunt. Every visit creates new challenges.</p>
         <div class="hero-actions"><button class="primary" id="exploreBtn" type="button">Explore the worlds <span aria-hidden="true">↓</span></button><button class="secondary" id="surpriseBtn" type="button">Surprise me! <span aria-hidden="true">🥚</span></button></div>
       </div>
       <div class="hero-art"><div class="horn-row" aria-hidden="true"><span class="horn"></span><span class="horn"></span></div><button class="hero-dino" type="button" data-sound="roar" aria-label="Tap the T-Rex for a roar"><img class="dino-art" src="assets/images/dinos/trex.svg" alt=""></button><div class="dino-claws" aria-hidden="true"><span class="claw"></span><span class="claw"></span></div><div class="egg-nest" aria-hidden="true"><span class="egg">🥚</span><span class="egg">🥚</span><span class="egg">🥚</span></div></div>
     </section>
 
     <section class="map-section" id="worlds" aria-labelledby="worldsTitle">
-      <div class="section-head"><div><h2 id="worldsTitle">Choose a dino world</h2><p>Each world makes unlimited new stories and questions.</p></div><div class="difficulty" aria-label="Choose difficulty"><button type="button" data-difficulty="easy" aria-pressed="true">Easy · Grade 1</button><button type="button" data-difficulty="medium" aria-pressed="false">Medium · Grade 2</button><button type="button" data-difficulty="hard" aria-pressed="false">Hard · Grade 3</button></div></div>
+      <div class="section-head"><div><h2 id="worldsTitle">Choose a dino world</h2><p>Each world makes unlimited new stories and questions.</p></div><div class="difficulty" aria-label="Choose level"><button type="button" data-difficulty="kindergarten" aria-pressed="true">Kindergarten</button><button type="button" data-difficulty="easy" aria-pressed="false">Grade 1</button><button type="button" data-difficulty="medium" aria-pressed="false">Grade 2</button><button type="button" data-difficulty="hard" aria-pressed="false">Grade 3</button></div></div>
+      <details class="kindergarten-guide" id="kindergartenGuide" open><summary>All 20 Kindergarten challenges</summary><ol><li>Count dinos to 10 and count to 20</li><li>Recognize numbers 0–20</li><li>Match one dino to each count</li><li>Trace and write numbers 0–20</li><li>Compare more, less, or equal</li><li>Add dino eggs within 5</li><li>Subtract dinos within 5</li><li>Break apart numbers to 10</li><li>Make 10 with dino friends</li><li>Name 2D shapes</li><li>Sort by color, size, or type</li><li>Continue AB patterns</li><li>Compare length, height, and weight</li><li>Use position words</li><li>Explore 3D shapes</li><li>Count dino stomps by tens</li><li>Put numbers 0–20 in order</li><li>Make equal groups; meet odd and even</li><li>Solve story problems within 10</li><li>Fill ten-frames with dino eggs</li></ol></details>
       <div class="world-map" id="worldMap"></div>
     </section>
 
@@ -36,14 +37,14 @@ app.innerHTML = `
       <div class="game-head"><div class="world-id"><div class="big-dino" id="gameDino" aria-hidden="true"></div><div><h2 id="gameTitle">Dino Counting Valley</h2><p id="gameSkills"></p></div></div><button class="back-btn" id="backBtn" type="button">← All worlds</button></div>
       <div class="progress-card"><span id="roundLabel">Egg 1 of 4</span><div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressFill"></div><span class="walker" id="walker">🦕</span></div><span id="roundStars">☆ ☆ ☆ ☆</span></div>
       <div class="play-layout" id="playLayout">
-        <article class="story-card" id="storyCard"><div class="story-copy"><div class="story-kicker" id="storyKicker">FIRST, THE DINO CLUE</div><h3 id="storyTitle"></h3><div class="story-voice-row"><p class="story-text" id="storyText"></p><button class="voice-btn" id="storySpeakBtn" type="button" aria-label="Hear the dino story"><span aria-hidden="true">🎙️</span> Hear Story</button></div><div class="voice-unavailable" id="voiceUnavailable" hidden>Voice reading is not available in this browser.</div></div><div class="visual" id="visual"></div><div class="explain-action"><button class="ready-btn" id="readyBtn" type="button">I see it — ask me! →</button></div></article>
-        <aside class="quiz-card" aria-labelledby="questionText"><div class="quiz-kicker"><span><span class="q-badge" aria-hidden="true">?</span> Quick dino check</span><span id="skillTag"></span></div><div id="quizWaiting" class="waiting"><div><span class="waiting-icon" aria-hidden="true">🥚</span>Read the dino clue first.<br>The question will hatch when you’re ready!</div></div><div id="quizBody" hidden><div class="question-row"><h3 class="question" id="questionText"></h3><button class="speak-btn" id="questionSpeakBtn" type="button" aria-label="Hear the question again">🔊</button></div><div class="answers" id="answers"></div><div class="feedback" id="feedback" role="status">Choose the answer you think is right.</div><button class="next-btn" id="nextBtn" type="button" disabled>Next egg →</button></div></aside>
+        <article class="story-card" id="storyCard"><div class="story-copy"><div class="story-kicker" id="storyKicker">FIRST, THE DINO CLUE</div><div class="story-heading"><h3 id="storyTitle"></h3><button class="voice-btn" id="storySpeakBtn" type="button" aria-label="Hear this dino story"><span aria-hidden="true">🎙️</span> Hear Story</button></div><p class="story-text" id="storyText"></p><div class="voice-unavailable" id="voiceUnavailable" hidden>Story voice is not available in this browser.</div></div><div class="visual" id="visual"></div><div class="explain-action"><button class="ready-btn" id="readyBtn" type="button">I see it — ask me! →</button></div></article>
+        <aside class="quiz-card" aria-labelledby="questionText"><div class="quiz-kicker"><span><span class="q-badge" aria-hidden="true">?</span> Quick dino check</span><span id="skillTag"></span></div><div id="quizWaiting" class="waiting"><div><span class="waiting-icon" aria-hidden="true">🥚</span>Read the dino clue first.<br>The question will hatch when you’re ready!</div></div><div id="quizBody" hidden><h3 class="question" id="questionText"></h3><div class="answers" id="answers"></div><div class="feedback" id="feedback" role="status">Choose the answer you think is right.</div><button class="next-btn" id="nextBtn" type="button" disabled>Next egg →</button></div></aside>
       </div>
       <div class="batch-end" id="batchEnd"><div class="trophy" aria-hidden="true">🏅</div><h3 id="finishTitle">Egg hunt complete!</h3><p id="finishText"></p><button class="more-btn" id="moreBtn" type="button">More Dino Eggs! 🥚</button></div>
     </section>
 
     <section class="badge-shelf" aria-labelledby="badgesTitle"><h2 id="badgesTitle">Dino badge shelf</h2><div class="badges" id="badges"></div></section>
-    <p class="parent-note">Grown-ups: Easy uses 0–20, Medium 0–50, and Hard 0–99. Stars and badges last only while this page stays open.</p>
+    <p class="parent-note">Grown-ups: Kindergarten focuses on 0–20 (plus counting by tens to 100), then Grades 1–3 use numbers below 100. Story voice is optional; questions and answers are never read aloud. Stars and badges last only while this page stays open.</p>
   </main>
   <div class="burst" id="burst" aria-hidden="true"></div>`;
 
@@ -56,8 +57,20 @@ const feedback = $('#feedback');
 const rand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
 const dinoImage = (world, decorative = true) => `<img class="dino-art" src="${world.image}" ${decorative ? 'alt=""' : `alt="Friendly ${world.dinoName}"`}>`;
 
+const kindergartenWorldSkills = [
+  'Count dinos to 10 and 20 · recognize, match, write, and order numbers 0–20.',
+  'Add eggs within 5 · break apart numbers · make 10 · fill ten-frames.',
+  'Subtract within 5 · compare groups · solve story problems within 10.',
+  'Sort by color, size, and type · continue AB patterns · meet odd and even.',
+  'Compare longer, taller, and heavier · use above, below, front, and behind.',
+  'Name circles, squares, triangles, rectangles, and hexagons · explore 3D shapes.',
+  'Build equal groups · count dino stomps by tens to 100.',
+  'Match one dino to one count · reason through number stories and ten-frames.'
+];
+
 function renderWorlds() {
-  worldMap.innerHTML = worlds.map((world, index) => `<button class="world" type="button" data-world="${index}" style="--c:${world.color}" aria-label="Open ${world.name}"><div class="world-top"><span class="world-dino" style="animation-delay:${index * 0.12}s">${dinoImage(world)}</span><span class="world-num">${index + 1}</span></div><h3>${world.icon} ${world.name}</h3><p>${world.short}</p><div class="world-foot"><span>${world.grades}</span><span class="world-stars">${session.hasBadge(index) ? '★ Badge' : '∞ practice'}</span></div></button>`).join('');
+  const levelLabel = state.difficulty === 'kindergarten' ? 'Kindergarten' : state.difficulty === 'easy' ? 'Grade 1' : state.difficulty === 'medium' ? 'Grade 2' : 'Grade 3';
+  worldMap.innerHTML = worlds.map((world, index) => `<button class="world" type="button" data-world="${index}" style="--c:${world.color}" aria-label="Open ${world.name} for ${levelLabel}"><div class="world-top"><span class="world-dino" style="animation-delay:${index * 0.12}s">${dinoImage(world)}</span><span class="world-num">${index + 1}</span></div><h3>${world.icon} ${world.name}</h3><p>${state.difficulty === 'kindergarten' ? kindergartenWorldSkills[index] : world.short}</p><div class="world-foot"><span>${levelLabel}</span><span class="world-stars">${session.hasBadge(index) ? '★ Badge' : '∞ practice'}</span></div></button>`).join('');
 }
 
 function renderBadges() {
@@ -71,7 +84,7 @@ function openWorld(index) {
   document.documentElement.style.setProperty('--world', world.color);
   $('#gameDino').innerHTML = dinoImage(world);
   $('#gameTitle').textContent = world.name;
-  $('#gameSkills').textContent = `${world.skills} · ${world.roar}`;
+  $('#gameSkills').textContent = `${state.difficulty === 'kindergarten' ? '20 Kindergarten math challenges' : world.skills} · ${world.roar}`;
   game.classList.add('active');
   $('#playLayout').style.display = 'grid';
   $('#batchEnd').classList.remove('active');
@@ -90,7 +103,7 @@ function newProblem() {
   $('#visual').innerHTML = current.visual;
   $('#skillTag').textContent = current.skill;
   $('#questionText').textContent = current.question;
-  answers.innerHTML = current.options.map((answer, index) => `<div class="answer-item"><button class="answer" type="button" data-answer="${answer}">${answer}</button><button class="speak-btn" type="button" data-speak-answer="${index}" aria-label="Hear answer ${answer}">🔊</button></div>`).join('');
+  answers.innerHTML = current.options.map((answer) => `<button class="answer" type="button" data-answer="${answer}">${answer}</button>`).join('');
   feedback.className = 'feedback';
   feedback.textContent = 'Choose the answer you think is right.';
   $('#nextBtn').disabled = true;
@@ -100,7 +113,6 @@ function newProblem() {
   $('#readyBtn').textContent = 'I see it — ask me! →';
   updateProgress();
   restartStoryAnimation();
-  if (state.readAloud) setTimeout(speakStory, 180);
 }
 
 function restartStoryAnimation() {
@@ -126,12 +138,12 @@ function revealQuestion() {
   $('#readyBtn').textContent = 'Question hatched! 🐣';
   playEffect('crack');
   $('#quizBody').style.animation = 'pageIn .35s ease both';
-  if (state.readAloud) setTimeout(speakQuestionAndAnswers, 220);
   if (innerWidth < 900) $('#quizBody').scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function answerQuestion(button) {
   if (state.answered) return;
+  unlockAudio();
   const correct = button.dataset.answer === state.problem.correct;
   if (correct) {
     state.answered = true;
@@ -142,18 +154,15 @@ function answerQuestion(button) {
     session.awardStar();
     $('#nextBtn').disabled = false;
     $('#nextBtn').textContent = state.round === 3 ? 'See my badge →' : 'Next dino egg →';
-    playWorldRoar(state.world);
-    playCelebration(state.world);
+    playCorrectCelebration(state.world);
     celebrate();
     worldEffect();
     updateProgress();
-    if (state.readAloud) setTimeout(() => speak(`Correct! ${state.problem.question} The answer is ${state.problem.correct}!`), 650);
   } else {
     button.classList.add('wrong');
     feedback.className = 'feedback try';
     feedback.textContent = 'Good thinking. Use the clue and try a different answer.';
     playEffect('wrong');
-    if (state.readAloud) setTimeout(() => speak('Good thinking. Use the clue and try a different answer.'), 180);
     setTimeout(() => button.classList.remove('wrong'), 520);
   }
 }
@@ -207,25 +216,19 @@ function worldEffect() {
 }
 
 function speakStory() {
-  if (!state.problem) return;
-  speak(`${worlds[state.world].name}. ${state.problem.title} ${state.problem.teach}`);
+  if (!state.problem || !state.storyVoice) return;
+  speakStoryText(state.problem.title);
 }
 
-function speakQuestionAndAnswers() {
-  if (!state.problem) return;
-  speak(`${state.problem.question} The answer choices are: ${state.problem.options.join('. Or, ')}.`);
-}
-
-function setReadAloud(on) {
-  state.readAloud = on;
-  const button = $('#readToggle');
+function setStoryVoice(on) {
+  state.storyVoice = on;
+  const button = $('#storyVoiceToggle');
   button.setAttribute('aria-pressed', String(on));
-  button.setAttribute('aria-label', on ? 'Turn read aloud off' : 'Turn read aloud on');
-  button.querySelector('span:last-child').textContent = on ? 'Read Aloud on' : 'Read Aloud';
-  if (!speechSupported) { $('#voiceUnavailable').hidden = false; button.disabled = true; return; }
-  if (!on) { stopSpeaking(); return; }
-  if (game.classList.contains('active')) $('#quizBody').hidden ? speakStory() : speakQuestionAndAnswers();
-  else speak('Read aloud is on. Choose a dino world to begin!');
+  button.setAttribute('aria-label', on ? 'Turn Teacher Maya story voice off' : 'Turn Teacher Maya story voice on');
+  button.querySelector('.tool-icon').textContent = on ? '🎙️' : '🔇';
+  button.querySelector('span:last-child').textContent = on ? 'Teacher Maya on' : 'Teacher Maya off';
+  $('#storySpeakBtn').disabled = !on || !speechSupported;
+  if (!on) stopSpeaking();
 }
 
 function tapDino(button) {
@@ -246,8 +249,6 @@ worldMap.addEventListener('click', (event) => {
 });
 
 document.addEventListener('click', (event) => {
-  const speaker = event.target.closest('[data-speak-answer]');
-  if (speaker) { speak(`Answer ${Number(speaker.dataset.speakAnswer) + 1}: ${state.problem.options[Number(speaker.dataset.speakAnswer)]}`); return; }
   const answer = event.target.closest('.answer');
   if (answer) { answerQuestion(answer); return; }
   const dino = event.target.closest('[data-sound]');
@@ -256,7 +257,9 @@ document.addEventListener('click', (event) => {
 
 document.querySelectorAll('[data-difficulty]').forEach((button) => button.addEventListener('click', () => {
   state.difficulty = button.dataset.difficulty;
+  $('#kindergartenGuide').hidden = state.difficulty !== 'kindergarten';
   document.querySelectorAll('[data-difficulty]').forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+  renderWorlds();
   playEffect('pop');
   if (game.classList.contains('active')) {
     session.resetRound();
@@ -268,34 +271,26 @@ document.querySelectorAll('[data-difficulty]').forEach((button) => button.addEve
 
 $('#readyBtn').addEventListener('click', revealQuestion);
 $('#storySpeakBtn').addEventListener('click', speakStory);
-$('#questionSpeakBtn').addEventListener('click', speakQuestionAndAnswers);
-$('#readToggle').addEventListener('click', () => setReadAloud(!state.readAloud));
+$('#storyVoiceToggle').addEventListener('click', () => setStoryVoice(!state.storyVoice));
 $('#nextBtn').addEventListener('click', next);
 $('#moreBtn').addEventListener('click', more);
 $('#backBtn').addEventListener('click', () => { $('#worlds').scrollIntoView({ behavior: 'smooth', block: 'start' }); playEffect('pop'); });
 $('#exploreBtn').addEventListener('click', () => $('#worlds').scrollIntoView({ behavior: 'smooth', block: 'start' }));
-$('#surpriseBtn').addEventListener('click', () => openWorld(rand(0, 7)));
+$('#surpriseBtn').addEventListener('click', () => openWorld(rand(0, worlds.length - 1)));
 $('#soundToggle').addEventListener('click', (event) => {
   state.sound = !state.sound;
   const button = event.currentTarget;
   button.setAttribute('aria-pressed', String(state.sound));
-  button.setAttribute('aria-label', state.sound ? 'Turn sounds off' : 'Turn sounds on');
+  button.setAttribute('aria-label', state.sound ? 'Turn dinosaur roars and effects off' : 'Turn dinosaur roars and effects on');
   button.querySelector('.tool-icon').textContent = state.sound ? '🔊' : '🔇';
-  button.querySelector('span:last-child').textContent = state.sound ? 'Sounds on' : 'Sounds off';
+  button.querySelector('span:last-child').textContent = state.sound ? 'Roars & FX on' : 'Roars & FX off';
   setSound(state.sound);
 });
-$('#jungleToggle').addEventListener('click', () => {
-  state.jungle = !state.jungle;
-  const button = $('#jungleToggle');
-  button.setAttribute('aria-pressed', String(state.jungle));
-  button.setAttribute('aria-label', state.jungle ? 'Turn dino beats off' : 'Turn dino beats on');
-  button.querySelector('span:last-child').textContent = state.jungle ? 'Dino beats on' : 'Dino beats off';
-  setBeats(state.jungle);
-});
-
 if (!setupVoices()) {
-  $('#readToggle').disabled = true;
+  $('#storyVoiceToggle').disabled = true;
+  $('#storySpeakBtn').disabled = true;
   $('#voiceUnavailable').hidden = false;
 }
+$('#kindergartenGuide').hidden = state.difficulty !== 'kindergarten';
 renderWorlds();
 renderBadges();

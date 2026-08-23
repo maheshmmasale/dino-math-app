@@ -9,4 +9,4 @@ export const worlds = [
   {id:'reasoning',name:'Reasoning Reef',dino:'🐊',dinoName:'Mosasaurus',image:'assets/images/dinos/mosasaurus.svg',icon:'🦖',roar:'Mosasaurus splash-roar',color:'#287fa0',grades:'Grades 2–3',skills:'two-step stories, rounding & logic',short:'Plan two steps, estimate wisely, and crack number puzzles.'}
 ];
 
-export const limits = { easy: 20, medium: 50, hard: 99 };
+export const limits = { kindergarten: 20, easy: 20, medium: 50, hard: 99 };
