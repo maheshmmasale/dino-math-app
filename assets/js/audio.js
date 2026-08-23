@@ -139,6 +139,9 @@ export function playWorldRoar(worldIndex) {
     return;
   }
   playElement(roar, () => synthRoar(worldIndex));
+
+export { roarFiles };
+export const AUDIO_VOLUME = 0.8;
 }
 
 export function playCorrectCelebration(worldIndex) {
