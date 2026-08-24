@@ -15,8 +15,13 @@ function JavaScriptFiles(directory) {
 }
 
 describe('application integration', () => {
+  it('keeps all eight regression suites in the repository', () => {
+    const expected = ['app.test.js', 'audio.test.js', 'curriculum.test.js', 'phonics.test.js', 'problems.test.js', 'storage.test.js', 'tts.test.js', 'worlds.test.js'];
+    expect(fs.readdirSync(path.join(root, 'tests/unit')).sort()).toEqual(expected);
+  });
+
   it('keeps the modular JavaScript structure', () => {
-    const expected = ['app.js', 'audio.js', 'problems.js', 'storage.js', 'stories.js', 'tts.js', 'worlds.js'];
+    const expected = ['app.js', 'audio.js', 'problems.js', 'storage.js', 'stories.js', 'tts.js', 'worlds.js', 'phonics.js', 'alphaBlocks.js'];
     expected.forEach((file) => expect(fs.existsSync(path.join(root, 'assets/js', file))).toBe(true));
     expect(fs.existsSync(path.join(root, 'assets/animations/effects.js'))).toBe(true);
   });
@@ -40,7 +45,7 @@ describe('application integration', () => {
   it('uses Teacher Maya only for the story title, never questions or answers', () => {
     const appSource = read('assets/js/app.js');
     const calls = [...appSource.matchAll(/speakStoryText\(([^)]*)\)/g)].map((match) => match[1].trim());
-    expect(calls).toEqual(['state.problem.title']);
+    expect(calls).toEqual(['text', 'state.problem.title']);
     expect(appSource).not.toMatch(/speakStoryText\([^)]*(question|answer|teach)/i);
   });
 

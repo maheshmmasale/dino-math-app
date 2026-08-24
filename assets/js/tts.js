@@ -1,4 +1,6 @@
-const supported = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+const supported = typeof window !== 'undefined'
+  && 'speechSynthesis' in window
+  && typeof globalThis.SpeechSynthesisUtterance === 'function';
 let selectedVoice = null;
 
 const preferredNames = [
@@ -32,7 +34,7 @@ function storySpeech(text) {
 export function speakStoryText(text) {
   if (!supported) return false;
   window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(storySpeech(text));
+  const utterance = new globalThis.SpeechSynthesisUtterance(storySpeech(text));
   utterance.rate = 0.87;
   utterance.pitch = 1.05;
   utterance.volume = 1;
@@ -53,7 +55,7 @@ export function setupVoices() {
 }
 
 export function voiceLabel() {
-  return selectedVoice ? `Teacher Maya, using ${selectedVoice.name}` : 'Teacher Maya';
+  return selectedVoice ? `Browser story voice: ${selectedVoice.name}` : 'Browser story voice';
 }
 
 export const speechSupported = supported;

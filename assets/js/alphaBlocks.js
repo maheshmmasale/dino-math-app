@@ -203,7 +203,7 @@ export function initAlphaBlocks(root, callbacks = {}) {
       root.querySelectorAll('[data-phonics-level]').forEach((button) => button.setAttribute('aria-pressed', String(button === levelButton)));
       state.completedPatterns.clear();
       egg.classList.remove('hatched'); egg.innerHTML = '🥚 <b>Family egg</b>';
-      updateSkillStrip(); newChallenge(); return;
+      updateSkillStrip(); setStory(); newChallenge(); return;
     }
     const activityButton = event.target.closest('[data-activity]');
     if (activityButton) {
@@ -257,7 +257,7 @@ export function initAlphaBlocks(root, callbacks = {}) {
     if (anyBlock) speakPhoneme(anyBlock.dataset.letter);
   });
 
-  skillStrip.insertAdjacentHTML('afterend', `<article class="phonics-story"><div><span>TEACHER MAYA'S LAGOON STORY</span><h3 data-phonics-story-title></h3><p data-phonics-story-copy></p></div><button type="button" data-hear-phonics-story>🎙️ Hear Story</button></article>`);
+  skillStrip.insertAdjacentHTML('afterend', `<article class="phonics-story"><div><span>LAGOON STORY</span><h3 data-phonics-story-title></h3><p data-phonics-story-copy></p></div><button type="button" data-hear-phonics-story>🎙️ Hear Story</button></article>`);
   const storyTitle = root.querySelector('[data-phonics-story-title]');
   const storyCopy = root.querySelector('[data-phonics-story-copy]');
   function setStory() {
@@ -266,7 +266,6 @@ export function initAlphaBlocks(root, callbacks = {}) {
     storyCopy.textContent = item.text;
   }
   root.querySelector('[data-hear-phonics-story]').addEventListener('click', () => callbacks.onStory?.(`${storyTitle.textContent}. ${storyCopy.textContent}`));
-  root.querySelectorAll('[data-phonics-level]').forEach((button) => button.addEventListener('click', () => setStory()));
 
   updateSkillStrip(); setStory(); renderStage();
   setupDragAndDrop(root, addLetter);

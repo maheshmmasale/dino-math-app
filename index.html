@@ -4,14 +4,24 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light">
-  <meta name="description" content="Eight dinosaur math worlds plus an interactive K–5 Phonics Lagoon with letter dinos, blending, stories, animations, and roars.">
+  <meta name="description" content="Eight prehistoric-creature math worlds plus an interactive K–5 Phonics Lagoon with letter dinos, blending, stories, animations, and roars.">
   <title>Dino Math App</title>
   <link rel="stylesheet" href="assets/css/main.css">
   <link rel="stylesheet" href="assets/css/dino-theme.css">
   <link rel="stylesheet" href="assets/css/animations.css">
 </head>
 <body>
-  <div id="app"></div>
+  <div id="app">
+    <main class="app" data-app-loading>
+      <section class="hero" aria-live="polite">
+        <div class="hero-copy">
+          <span class="eyebrow">Math K–3 + Phonics K–5</span>
+          <h1>Hatching the dino worlds…</h1>
+          <p>Loading eight math worlds and Phonics Lagoon.</p>
+        </div>
+      </section>
+    </main>
+  </div>
   <script type="module" src="assets/js/app.js"></script>
 </body>
 </html>

@@ -6,15 +6,20 @@ import { playEffect, playWorldRoar, playCorrectCelebration, setSound, unlockAudi
 import { setupVoices, speakStoryText, stopSpeaking, speechSupported } from './tts.js';
 import { confettiColors, effectForWorld } from '../animations/effects.js';
 
-const app = document.querySelector('#app');
+const app = document.querySelector('#app') || (() => {
+  const mount = document.createElement('div');
+  mount.id = 'app';
+  document.body.appendChild(mount);
+  return mount;
+})();
 app.innerHTML = `
   <main class="app">
     <div class="toolbar">
       <div class="session-score" aria-live="polite"><span aria-hidden="true">⭐</span><span id="starCount">0 stars this safari</span></div>
       <div class="tool-group">
         <button class="tool-btn" id="soundToggle" type="button" aria-pressed="true" aria-label="Turn dinosaur roars and effects off"><span class="tool-icon" aria-hidden="true">🔊</span><span>Roars &amp; FX on</span></button>
-        <button class="tool-btn" id="storyVoiceToggle" type="button" aria-pressed="true" aria-label="Turn Teacher Maya story voice off"><span class="tool-icon" aria-hidden="true">🎙️</span><span>Teacher Maya on</span></button>
-        <details class="voice-settings"><summary>Voice settings</summary><div class="voice-panel"><strong>Teacher Maya · warm female</strong><p>Inspired by gentle toddler teachers like Ms Rachel — slow, clear, and encouraging. This is not a clone of any real person. Voice is used only when you tap <b>Hear Story</b>.</p><small>Teacher Maya uses the best warm English voice installed in this browser. A future server-backed edition could support a high-quality TTS provider with your own API key.</small></div></details>
+        <button class="tool-btn" id="storyVoiceToggle" type="button" aria-pressed="true" aria-label="Turn browser story voice off"><span class="tool-icon" aria-hidden="true">🎙️</span><span>Story voice on</span></button>
+        <details class="voice-settings"><summary>Voice settings</summary><div class="voice-panel"><strong>Warm browser story voice</strong><p>Slow, clear, and encouraging. Voice is used only when you tap <b>Hear Story</b>.</p><small>The app uses the best English voice available in this browser, so the exact voice varies by device.</small></div></details>
       </div>
     </div>
 
@@ -29,7 +34,7 @@ app.innerHTML = `
     </section>
 
     <section class="map-section" id="worlds" aria-labelledby="worldsTitle">
-      <div class="section-head"><div><h2 id="worldsTitle">Choose a dino world</h2><p>Each math world generates fresh randomized practice.</p></div><div class="difficulty" aria-label="Choose level"><button type="button" data-difficulty="kindergarten" aria-pressed="true">Kindergarten</button><button type="button" data-difficulty="easy" aria-pressed="false">Grade 1</button><button type="button" data-difficulty="medium" aria-pressed="false">Grade 2</button><button type="button" data-difficulty="hard" aria-pressed="false">Grade 3</button></div></div>
+      <div class="section-head"><div><h2 id="worldsTitle">Choose a prehistoric world</h2><p>Each math world generates fresh randomized practice.</p></div><div class="difficulty" aria-label="Choose level"><button type="button" data-difficulty="kindergarten" aria-pressed="true">Kindergarten</button><button type="button" data-difficulty="easy" aria-pressed="false">Grade 1</button><button type="button" data-difficulty="medium" aria-pressed="false">Grade 2</button><button type="button" data-difficulty="hard" aria-pressed="false">Grade 3</button></div></div>
       <details class="kindergarten-guide" id="kindergartenGuide" open><summary>All 20 Kindergarten challenges</summary><ol><li>Count dinos to 10 and count to 20</li><li>Recognize numbers 0–20</li><li>Match one dino to each count</li><li>Trace and write numbers 0–20</li><li>Compare more, less, or equal</li><li>Add dino eggs within 5</li><li>Subtract dinos within 5</li><li>Break apart numbers to 10</li><li>Make 10 with dino friends</li><li>Name 2D shapes</li><li>Sort by color, size, or type</li><li>Continue AB patterns</li><li>Compare length, height, and weight</li><li>Use position words</li><li>Explore 3D shapes</li><li>Count dino stomps by twos to 20</li><li>Put numbers 0–20 in order</li><li>Make equal groups; meet odd and even</li><li>Solve story problems within 10</li><li>Fill ten-frames with dino eggs</li></ol></details>
       <div class="world-map" id="worldMap"></div>
     </section>
@@ -51,7 +56,19 @@ app.innerHTML = `
   </main>
   <div class="burst" id="burst" aria-hidden="true"></div>`;
 
-const state = session.state;
+const defaultState = {
+  world: 0,
+  difficulty: 'kindergarten',
+  round: 0,
+  stars: 0,
+  roundCorrect: 0,
+  badges: new Set(),
+  problem: null,
+  answered: false,
+  sound: true,
+  storyVoice: true
+};
+const state = Object.assign(defaultState, session?.state && typeof session.state === 'object' ? session.state : {});
 const $ = (selector) => document.querySelector(selector);
 const worldMap = $('#worldMap');
 const game = $('#game');
@@ -244,9 +261,9 @@ function setStoryVoice(on) {
   state.storyVoice = on;
   const button = $('#storyVoiceToggle');
   button.setAttribute('aria-pressed', String(on));
-  button.setAttribute('aria-label', on ? 'Turn Teacher Maya story voice off' : 'Turn Teacher Maya story voice on');
+  button.setAttribute('aria-label', on ? 'Turn browser story voice off' : 'Turn browser story voice on');
   button.querySelector('.tool-icon').textContent = on ? '🎙️' : '🔇';
-  button.querySelector('span:last-child').textContent = on ? 'Teacher Maya on' : 'Teacher Maya off';
+  button.querySelector('span:last-child').textContent = on ? 'Story voice on' : 'Story voice off';
   $('#storySpeakBtn').disabled = !on || !speechSupported;
   if (!on) stopSpeaking();
 }

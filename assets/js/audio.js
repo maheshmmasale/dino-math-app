@@ -1,3 +1,5 @@
+export const AUDIO_VOLUME = 0.8;
+
 export const roarFiles = [
   '../sounds/roars/bronto-hum.mp3',
   '../sounds/roars/trex-roar.mp3',
@@ -8,7 +10,7 @@ export const roarFiles = [
   '../sounds/roars/ankylo-stomp.mp3',
   '../sounds/roars/mosa-splash.mp3'
 ];
-export const AUDIO_VOLUME = 0.8; const effectFiles = {
+const effectFiles = {
   crack: '../sounds/fx/egg-crack.mp3',
   boom: '../sounds/fx/volcano-boom.mp3',
   correct: '../sounds/fx/correct-chime.mp3',
@@ -18,13 +20,19 @@ export const AUDIO_VOLUME = 0.8; const effectFiles = {
 };
 
 const makeAudio = (path) => {
-  const resolved = new URL(path, import.meta.url).href;
-  const element = new Audio(resolved);
-  element.preload = 'auto';
-  element.volume = AUDIO_VOLUME;
-  element.dataset.source = resolved;
-  element.load();
-  return element;
+  if (typeof globalThis.Audio !== 'function') return null;
+  try {
+    const resolved = new URL(path, import.meta.url).href;
+    const element = new globalThis.Audio(resolved);
+    element.preload = 'auto';
+    element.volume = AUDIO_VOLUME;
+    element.dataset.source = resolved;
+    element.load();
+    return element;
+  } catch (error) {
+    console.warn(`Could not prepare dinosaur audio: ${path}`, error);
+    return null;
+  }
 };
 const roars = roarFiles.map(makeAudio);
 const effects = Object.fromEntries(Object.entries(effectFiles).map(([name, path]) => [name, makeAudio(path)]));
@@ -32,7 +40,9 @@ let enabled = true;
 let context;
 
 function ctx() {
-  if (!context) context = new (window.AudioContext || window.webkitAudioContext)();
+  const AudioContext = globalThis.window?.AudioContext || globalThis.window?.webkitAudioContext;
+  if (!AudioContext) return null;
+  if (!context) context = new AudioContext();
   if (context.state === 'suspended') context.resume();
   return context;
 }
@@ -40,6 +50,7 @@ function ctx() {
 function tone(frequency, start, duration, type = 'sine', gain = 0.055) {
   if (!enabled) return;
   const audioContext = ctx();
+  if (!audioContext) return;
   const oscillator = audioContext.createOscillator();
   const envelope = audioContext.createGain();
   oscillator.type = type;
@@ -62,6 +73,7 @@ function fallbackEffect(kind) {
 function synthRoar(worldIndex) {
   if (!enabled) return;
   const audioContext = ctx();
+  if (!audioContext) return;
   const profiles = [
     { duration: 1.25, low: 78, high: 180, sweep: -34, gain: .17 },
     { duration: 1.05, low: 52, high: 145, sweep: -28, gain: .22 },
@@ -105,6 +117,7 @@ function synthRoar(worldIndex) {
 
 function playElement(element, onFailure) {
   if (!enabled) return;
+  if (!element) { onFailure(); return; }
   const fail = (error) => {
     console.warn(`Dino audio failed: ${element.dataset.source || element.src}`, error);
     onFailure();
@@ -139,9 +152,6 @@ export function playWorldRoar(worldIndex) {
     return;
   }
   playElement(roar, () => synthRoar(worldIndex));
-
-
-
 }
 
 export function playCorrectCelebration(worldIndex) {
@@ -152,8 +162,8 @@ export function playCorrectCelebration(worldIndex) {
 export function setSound(on) {
   enabled = on;
   if (!on) {
-    roars.forEach((audio) => { audio.pause(); audio.currentTime = 0; });
-    Object.values(effects).forEach((audio) => { audio.pause(); audio.currentTime = 0; });
+    roars.filter(Boolean).forEach((audio) => { audio.pause(); audio.currentTime = 0; });
+    Object.values(effects).filter(Boolean).forEach((audio) => { audio.pause(); audio.currentTime = 0; });
     if (context) context.suspend();
   }
   if (on) { ctx(); playEffect('pop'); }
