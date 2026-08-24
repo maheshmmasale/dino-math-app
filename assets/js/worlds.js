@@ -9,4 +9,17 @@ export const worlds = [
   {id:'reasoning',name:'Reasoning Reef',dino:'🐊',dinoName:'Mosasaurus',image:'assets/images/dinos/mosasaurus.svg',icon:'🦖',roar:'Mosasaurus splash-roar',color:'#287fa0',grades:'Grades 2–3',skills:'two-step stories, rounding & logic',short:'Plan two steps, estimate wisely, and crack number puzzles.'}
 ];
 
+export const phonicsWorld = {
+  id: 'phonics',
+  name: 'Phonics Lagoon',
+  dinoName: 'Alpha Dino Blocks',
+  image: 'assets/images/dinos/triceratops.svg',
+  icon: '🔤',
+  roar: 'Letter dino roar',
+  color: '#176b83',
+  grades: 'Kindergarten–Grade 5',
+  skills: 'letter sounds, blending, word families, morphology & fluency',
+  short: 'Dino letters hold hands, sound out words, split apart, and hatch reading skills.'
+};
+
 export const limits = { kindergarten: 20, easy: 20, medium: 50, hard: 99 };
