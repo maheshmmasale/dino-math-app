@@ -1,5 +1,5 @@
 {
-  "scope": "Kindergarten through Grade 3 mathematics and reasoning",
+  "scope": "Kindergarten through Grade 3 mathematics and reasoning, plus Kindergarten through Grade 5 phonics",
   "numberLimits": { "kindergarten": 20, "grade1": 20, "grade2": 50, "grade3": 99 },
   "standardsByGrade": {
     "kindergarten": ["K.CC", "K.OA", "K.MD", "K.G"],
@@ -26,12 +26,24 @@
       "measure and compare",
       "position words",
       "3D shapes and movement",
-      "count by tens to 100",
+      "count by twos to 20",
       "number order 0-20",
       "equal groups and odd/even introduction",
       "story problems within 10",
       "ten-frames"
     ]
+  },
+  "phonics": {
+    "world": "Phonics Lagoon",
+    "grades": {
+      "kindergarten": ["letter names A-Z uppercase and lowercase", "letter sounds", "rhyming", "initial sounds", "CVC -at and -an", "simple 2-3 letter blending"],
+      "grade1": ["short vowels", "word families", "consonant blends bl cr st", "digraphs sh ch th", "CVCe introduction"],
+      "grade2": ["long vowels", "vowel teams ai ee oa", "r-controlled ar or", "diphthongs oi ou", "2-syllable blending"],
+      "grade3": ["multisyllabic decoding", "prefixes re- un-", "suffixes -ing -ed", "vowel plus e", "soft c and g"],
+      "grade4": ["advanced morphology", "Greek and Latin roots", "spelling patterns -tion -sion", "decoding 3-4 syllables"],
+      "grade5": ["complex phonics in context", "fluency", "reading words in sentences", "comprehension of decoded words"]
+    },
+    "activities": ["Sound Pop", "Build It", "Mix and Match", "Silly Sentences", "hold-hands blending", "tap to segment"]
   },
   "worlds": [
     { "id": "counting", "grades": [1, 2], "topics": ["counting", "skip counting", "place value", "compare and order"] },
