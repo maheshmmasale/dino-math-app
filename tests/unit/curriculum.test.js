@@ -26,6 +26,14 @@ describe('curriculum data', () => {
     expect(curriculum.kindergarten.topics).toHaveLength(20);
   });
 
+  it('maps phonics from Kindergarten through Grade 5', () => {
+    expect(curriculum.scope).toMatch(/Grade 5 phonics/i);
+    expect(Object.keys(curriculum.phonics.grades)).toEqual(['kindergarten', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5']);
+    expect(curriculum.phonics.grades.kindergarten).toEqual(expect.arrayContaining(['letter sounds', 'CVC -at and -an']));
+    expect(curriculum.phonics.grades.grade5).toEqual(expect.arrayContaining(['fluency', 'reading words in sentences']));
+    expect(curriculum.phonics.activities).toEqual(expect.arrayContaining(['Sound Pop', 'Build It', 'Mix and Match', 'Silly Sentences']));
+  });
+
   it('has one curriculum mapping for each world', () => {
     expect(curriculum.worlds.map((world) => world.id)).toEqual([
       'counting', 'addition', 'subtraction', 'patterns', 'measure', 'shapes', 'multiplication', 'reasoning'
