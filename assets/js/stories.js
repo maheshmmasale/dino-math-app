@@ -1,4 +1,17 @@
-// Story copy lives apart from the math generators so narrative and curriculum can evolve independently.
+// Story copy lives apart from the generators so narrative and curriculum can evolve independently.
+export const phonicsStories = {
+  kindergarten: { title: 'The first sound-saurus parade', text: 'At Phonics Lagoon, little letter dinos discover that every letter has a sound. When C, A, and T hold hands, their sounds slide together and wake a sleepy cat!' },
+  grade1: { title: 'The digraph twins find one voice', text: 'S and H stomp in from different caves. When they hold hands, they share one quiet shhh sound and guide a ship safely across the lagoon.' },
+  grade2: { title: 'Two vowels on the long trail', text: 'A and I travel side by side through the rain. Their vowel team makes a strong new sound, and the Alpha Dinos cheer as the word train rolls into view.' },
+  grade3: { title: 'The word-part expedition', text: 'Rex finds re at the start of play and learns that replay means play again. Useful prefixes and suffixes help the herd unlock bigger words.' },
+  grade4: { title: 'The ancient root cave', text: 'Deep in Root Cave, the dinos find port, a word part meaning carry. It helps them decode transport, portable, and export without guessing.' },
+  grade5: { title: 'The fluent fossil reader', text: 'Maya the Mosasaurus reads a challenging sentence in meaningful phrases. She checks each complex word, then rereads smoothly so the whole idea shines.' }
+};
+
+export function phonicsStory(level) {
+  return phonicsStories[level] || phonicsStories.kindergarten;
+}
+
 export function story(kind, data = {}) {
   const stories = {
     count: [`Bindi the Brontosaurus found ${data.n} shiny claw-casts and balanced them on her head. She sneezed, they rattled, and she counted them again with a giggle!`, 'Counting each object once tells how many are in the set. Point to every claw as you count.'],
