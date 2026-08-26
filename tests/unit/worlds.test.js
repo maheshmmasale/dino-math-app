@@ -22,7 +22,7 @@ describe('world definitions', () => {
   it('contains the eight expected worlds plus the Kindergarten level', () => {
     expect(worlds).toHaveLength(8);
     expect(worlds.map((world) => world.name.replace(/^Dino /, ''))).toEqual(expected.map(([name]) => name));
-    expect(limits).toEqual({ kindergarten: 20, easy: 20, medium: 50, hard: 99 });
+    expect(limits).toEqual({ kindergarten: 30, easy: 500, medium: 1000, hard: 5000 });
   });
 
   it('maps each world to the intended dinosaur, grades, and roar', () => {

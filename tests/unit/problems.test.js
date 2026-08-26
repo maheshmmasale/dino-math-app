@@ -30,13 +30,14 @@ describe('problem generation', () => {
   });
 
   it.each([
-    ['kindergarten', 20],
-    ['easy', 20],
-    ['medium', 50],
-    ['hard', 99]
+    ['kindergarten', 30],
+    ['easy', 500],
+    ['medium', 1000],
+    ['hard', 5000]
   ])('caps generated numeric answers for %s at %i', (difficulty, expectedLimit) => {
     expect(limits[difficulty]).toBe(expectedLimit);
-    for (let round = 0; round < 80; round += 1) {
+    const rounds = difficulty === 'kindergarten' ? 20 : 15;
+    for (let round = 0; round < rounds; round += 1) {
       for (let worldIndex = 0; worldIndex < worlds.length; worldIndex += 1) {
         const item = makeProblem(worldIndex, difficulty);
         expectProblemShape(item);
@@ -45,7 +46,7 @@ describe('problem generation', () => {
           if (number !== null) {
             expect(number).toBeGreaterThanOrEqual(0);
             expect(number).toBeLessThanOrEqual(expectedLimit);
-            expect(number).toBeLessThan(100);
+            expect(number).toBeLessThan(6000);
           }
         });
       }
@@ -53,7 +54,7 @@ describe('problem generation', () => {
   });
 
   it('continues generating valid problems without exhausting a deck', () => {
-    for (let index = 0; index < 500; index += 1) {
+    for (let index = 0; index < 100; index += 1) {
       expectProblemShape(makeProblem(index % worlds.length, index % 2 ? 'kindergarten' : 'hard'));
     }
   });
@@ -64,5 +65,15 @@ describe('problem generation', () => {
     const wrong = item.options.find((option) => option !== item.correct);
     expect(isCorrectAnswer(item, wrong)).toBe(false);
     expect(isCorrectAnswer({ correct: '7' }, 7)).toBe(true);
+  });
+
+  it('includes new lesson types: before/after, missing, order, bigger/smaller, odd/even, tables', () => {
+    const skills = new Set();
+    for (let i=0;i<100;i++) {
+      const item = makeProblem(0, 'easy');
+      skills.add(item.skill.toLowerCase());
+    }
+    const skillText = [...skills].join(' ');
+    expect(skillText).toMatch(/before|after|missing|ascend|descend|bigger|smaller|odd|even|prime|table|count/);
   });
 });

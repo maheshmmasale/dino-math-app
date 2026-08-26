@@ -9,7 +9,7 @@ const curriculum = JSON.parse(fs.readFileSync(path.join(root, 'assets/data/curri
 describe('curriculum data', () => {
   it('covers Kindergarten and every grade from 1 through 3', () => {
     expect(curriculum.scope).toMatch(/Kindergarten through Grade 3/i);
-    expect(curriculum.numberLimits).toEqual({ kindergarten: 20, grade1: 20, grade2: 50, grade3: 99 });
+    expect(curriculum.numberLimits).toEqual({ kindergarten: 30, grade1: 500, grade2: 1000, grade3: 5000 });
     const grades = new Set(curriculum.worlds.flatMap((world) => world.grades));
     expect([...grades].sort()).toEqual([1, 2, 3]);
   });
