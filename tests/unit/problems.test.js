@@ -12,7 +12,7 @@ function expectProblemShape(item) {
     visual: expect.any(String),
     skill: expect.any(String)
   }));
-  expect(item.options).toHaveLength(4);
+  expect(item.options).toHaveLength(item.skill === 'Say Coins' ? 10 : 4);
   expect(item.options).toContain(item.correct);
 }
 
@@ -22,22 +22,25 @@ function cappedNumber(value) {
 }
 
 describe('problem generation', () => {
-  it('keeps exactly 20 distinct Kindergarten challenge types', () => {
-    expect(KINDERGARTEN_CHALLENGE_COUNT).toBe(20);
-    const cycle = Array.from({ length: 20 }, () => makeProblem(0, 'kindergarten'));
-    expect(new Set(cycle.map((item) => item.skill)).size).toBe(20);
+  it('keeps exactly 21 distinct Kindergarten challenge types, including Say Coins', () => {
+    expect(KINDERGARTEN_CHALLENGE_COUNT).toBe(21);
+    const cycle = Array.from({ length: 21 }, () => makeProblem(0, 'kindergarten'));
+    expect(new Set(cycle.map((item) => item.skill)).size).toBe(21);
+    const coinGame = cycle.find((item) => item.skill === 'Say Coins');
+    expect(coinGame).toEqual(expect.objectContaining({ title: 'Say Coins', question: 'Say all 10 numbers!' }));
+    expect(coinGame.options).toEqual(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']);
+    expect(coinGame.visual).toContain('id="coinGrid"');
     cycle.forEach(expectProblemShape);
   });
 
   it.each([
-    ['kindergarten', 30],
-    ['easy', 500],
-    ['medium', 1000],
-    ['hard', 5000]
+    ['kindergarten', 20],
+    ['easy', 20],
+    ['medium', 50],
+    ['hard', 99]
   ])('caps generated numeric answers for %s at %i', (difficulty, expectedLimit) => {
     expect(limits[difficulty]).toBe(expectedLimit);
-    const rounds = difficulty === 'kindergarten' ? 20 : 15;
-    for (let round = 0; round < rounds; round += 1) {
+    for (let round = 0; round < 80; round += 1) {
       for (let worldIndex = 0; worldIndex < worlds.length; worldIndex += 1) {
         const item = makeProblem(worldIndex, difficulty);
         expectProblemShape(item);
@@ -46,7 +49,7 @@ describe('problem generation', () => {
           if (number !== null) {
             expect(number).toBeGreaterThanOrEqual(0);
             expect(number).toBeLessThanOrEqual(expectedLimit);
-            expect(number).toBeLessThan(6000);
+            expect(number).toBeLessThan(100);
           }
         });
       }
@@ -54,7 +57,7 @@ describe('problem generation', () => {
   });
 
   it('continues generating valid problems without exhausting a deck', () => {
-    for (let index = 0; index < 100; index += 1) {
+    for (let index = 0; index < 500; index += 1) {
       expectProblemShape(makeProblem(index % worlds.length, index % 2 ? 'kindergarten' : 'hard'));
     }
   });
@@ -65,15 +68,5 @@ describe('problem generation', () => {
     const wrong = item.options.find((option) => option !== item.correct);
     expect(isCorrectAnswer(item, wrong)).toBe(false);
     expect(isCorrectAnswer({ correct: '7' }, 7)).toBe(true);
-  });
-
-  it('includes new lesson types: before/after, missing, order, bigger/smaller, odd/even, tables', () => {
-    const skills = new Set();
-    for (let i=0;i<100;i++) {
-      const item = makeProblem(0, 'easy');
-      skills.add(item.skill.toLowerCase());
-    }
-    const skillText = [...skills].join(' ');
-    expect(skillText).toMatch(/before|after|missing|ascend|descend|bigger|smaller|odd|even|prime|table|count/);
   });
 });

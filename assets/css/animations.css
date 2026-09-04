@@ -15,3 +15,9 @@
 @keyframes roar{0%{opacity:0;transform:scale(.4) rotate(-8deg)}35%{opacity:1;transform:scale(1.15) rotate(6deg)}100%{opacity:0;transform:scale(1.5)}}
 @keyframes floatPop{0%{opacity:0;transform:translate(-50%,10px) scale(.7)}35%{opacity:1;transform:translate(-50%,-4px) scale(1.08)}100%{opacity:0;transform:translate(-50%,-26px) scale(1)}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.hero-dino,.egg,.world-dino,.big-dino,.walker,.visual-emoji,.badge-item strong,.batch-end .trophy,.sound-pop,.fx,.burst i{animation:none!important}.world:hover{transform:none}.progress-fill,.walker{transition:none}}
+
+@keyframes letterSpeak{0%,100%{transform:translateY(0) rotate(0)}35%{transform:translateY(-12px) rotate(-5deg)}65%{transform:translateY(-7px) rotate(5deg)}}
+@keyframes segmentPop{0%,100%{transform:translate(0) rotate(0)}45%{transform:translate(var(--pop-x,8px),-18px) rotate(8deg)}}
+@keyframes initialHop{0%,100%{transform:translateY(0) rotate(0)}45%{transform:translateY(-30px) rotate(-10deg)}}
+@keyframes wordLand{0%{transform:translateY(-18px) scale(.7);opacity:.2}70%{transform:translateY(3px) scale(1.12)}100%{transform:none;opacity:1}}
+@media(prefers-reduced-motion:reduce){.alpha-block.speaking,.blend-line.segmenting .alpha-block,.mix-words>button.active .alpha-block,.sentence-frame button.filled,.family-egg.hatched{animation:none!important}}

@@ -53,4 +53,15 @@ describe('application integration', () => {
     const appSource = read('assets/js/app.js');
     expect(appSource).toMatch(/if \(correct\)[\s\S]*playCorrectCelebration\(state\.world\)/);
   });
+
+  it('keeps Say Coins voice recognition, tap fallback, and completion gating wired', () => {
+    const appSource = read('assets/js/app.js');
+    expect(appSource).toMatch(/window\.SpeechRecognition \|\| window\.webkitSpeechRecognition/);
+    expect(appSource).toMatch(/recognition\.start\(\)/);
+    expect(appSource).toMatch(/recognition\.continuous = false/);
+    expect(appSource).toMatch(/recognition\.maxAlternatives = 3/);
+    expect(appSource).toMatch(/grid\.querySelectorAll\('\.coin'\).*flipCoin/);
+    expect(appSource).toMatch(/flippedSet\.size === 10\) finishCoinGame/);
+    expect(appSource).toMatch(/All coins flipped! ROAR!/);
+  });
 });

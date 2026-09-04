@@ -1,6 +1,6 @@
 {
   "scope": "Kindergarten through Grade 3 mathematics and reasoning, plus Kindergarten through Grade 5 phonics",
-  "numberLimits": { "kindergarten": 30, "grade1": 500, "grade2": 1000, "grade3": 5000 },
+  "numberLimits": { "kindergarten": 20, "grade1": 20, "grade2": 50, "grade3": 99 },
   "standardsByGrade": {
     "kindergarten": ["K.CC", "K.OA", "K.MD", "K.G"],
     "grade1": ["1.OA", "1.NBT", "1.MD", "1.G"],
@@ -11,26 +11,26 @@
     "standards": ["K.CC", "K.OA", "K.MD", "K.G"],
     "challengeCount": 20,
     "topics": [
-      "count dinos to 30 and dino counting show",
-      "before and after numbers to 30",
-      "missing number in sequence",
-      "ascending and descending order",
-      "bigger and smaller numbers comparison",
-      "odd and even numbers introduction",
-      "addition within 10 with how-to lesson",
-      "subtraction within 10 with how-to lesson",
+      "count dinos to 10 and count to 20",
+      "number recognition 0-20",
+      "one-to-one correspondence",
+      "write numbers 0-20",
+      "compare groups: more, less, equal",
+      "addition within 5",
+      "subtraction within 5",
       "decompose numbers to 10",
-      "make 10 and number bonds",
-      "2D shapes and dino recognition",
-      "sort by color, size, or dino type",
-      "AB patterns and number patterns",
-      "measure and compare with dinos",
-      "position words and dino parade",
-      "count by twos, threes, fives to 30",
-      "number order 0-30 before/after",
-      "equal groups, odd/even and prime intro",
-      "story problems within 10 with dino",
-      "ten-frames and tables 2s 5s introduction"
+      "make 10",
+      "2D shapes",
+      "sort by color, size, or type",
+      "AB patterns",
+      "measure and compare",
+      "position words",
+      "3D shapes and movement",
+      "count by twos to 20",
+      "number order 0-20",
+      "equal groups and odd/even introduction",
+      "story problems within 10",
+      "ten-frames"
     ]
   },
   "phonics": {
@@ -46,13 +46,13 @@
     "activities": ["Sound Pop", "Build It", "Mix and Match", "Silly Sentences", "hold-hands blending", "tap to segment"]
   },
   "worlds": [
-    { "id": "counting", "grades": [1, 2], "topics": ["counting to 30-1000", "before and after numbers", "missing number", "ascending and descending order", "bigger smaller comparison", "odd even prime"] },
-    { "id": "addition", "grades": [1, 2, 3], "topics": ["how to add lesson", "addition within limits", "missing addends", "regrouping", "bigger smaller with addition"] },
-    { "id": "subtraction", "grades": [1, 2, 3], "topics": ["how to subtract lesson", "subtraction within limits", "unknowns", "regrouping", "compare differences"] },
-    { "id": "patterns", "grades": [1, 2, 3], "topics": ["repeating patterns", "number sequences missing number", "before after in patterns", "odd and even", "prime numbers grade 3"] },
-    { "id": "measure", "grades": [1, 2, 3], "topics": ["time", "money", "length", "compare bigger smaller"] },
-    { "id": "shapes", "grades": [1, 2, 3], "topics": ["shape properties", "fractions", "area", "perimeter", "ascending descending by size"] },
-    { "id": "multiplication", "grades": [2, 3], "topics": ["equal groups", "arrays", "tables 2s 3s 4s 5s 10s", "multiplication", "division"] },
-    { "id": "reasoning", "grades": [2, 3], "topics": ["two-step problems", "estimation", "rounding", "prime and composite", "logic puzzles"] }
+    { "id": "counting", "grades": [1, 2], "topics": ["counting", "skip counting", "place value", "compare and order"] },
+    { "id": "addition", "grades": [1, 2, 3], "topics": ["addition", "missing addends", "regrouping"] },
+    { "id": "subtraction", "grades": [1, 2, 3], "topics": ["subtraction", "unknowns", "regrouping"] },
+    { "id": "patterns", "grades": [1, 2, 3], "topics": ["repeating patterns", "number sequences", "odd and even"] },
+    { "id": "measure", "grades": [1, 2, 3], "topics": ["time", "money", "length"] },
+    { "id": "shapes", "grades": [1, 2, 3], "topics": ["shape properties", "fractions", "area", "perimeter"] },
+    { "id": "multiplication", "grades": [2, 3], "topics": ["equal groups", "arrays", "multiplication", "division"] },
+    { "id": "reasoning", "grades": [2, 3], "topics": ["two-step problems", "estimation", "rounding", "logic"] }
   ]
 }

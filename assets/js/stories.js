@@ -15,13 +15,6 @@ export function phonicsStory(level) {
 export function story(kind, data = {}) {
   const stories = {
     count: [`Bindi the Brontosaurus found ${data.n} shiny claw-casts and balanced them on her head. She sneezed, they rattled, and she counted them again with a giggle!`, 'Counting each object once tells how many are in the set. Point to every claw as you count.'],
-    before: [`Tiko the Triceratops lines up ${data.n} friends. Which number stands right BEFORE ${data.n}?`, `Before ${data.n} is ${data.n - 1}. Count backward one step.`],
-    after: [`Tiko's parade marches to ${data.n}. Who comes right AFTER?`, `After ${data.n} is ${data.n + 1}. Count forward one step.`],
-    missing: [`Some number eggs rolled away from ${data.start}'s line! Find the missing number.`, 'Look at the sequence, find the hole, fill it with the right number.'],
-    asc: [`Dinos want to line up smallest to biggest. Help them ascend!`, 'Ascending order means smallest to biggest, like climbing up.'],
-    desc: [`Biggest dinos first! Order them descending.`, 'Descending order means biggest to smallest, like sliding down.'],
-    prime: [`Is ${data.n} prime? Prime dinos cannot be split into equal groups!`, 'Prime numbers have only two factors: 1 and itself.'],
-    order: [`Order these dino numbers from smallest to biggest!`, 'Compare numbers to order them ascending.'],
     skip: [`Bongo the Bronto tiptoes in jumps of ${data.step}: ${data.start}, ${data.a}, ${data.b}… His enormous tail keeps the beat, but his tiny hat keeps falling off!`, `The same amount is added at every stomp. Add ${data.step} one more time.`],
     place: [`Pico painted ${data.n} on a giant egg using one careful claw. Then he sat on the paint and wore the number on his tail!`, "A digit's position tells its value. Find the digit in the tens place."],
     compare: [`Two long-necks compare horn piles: one has ${data.a} and the other has ${data.b}. They stretch so high to peek that their noses bump—bonk!`, 'Compare the greatest place value first. The first different digit decides which number is greater.'],
@@ -45,7 +38,6 @@ export function story(kind, data = {}) {
     logic: [`Milo's three splashy friends wear shell numbers ${(data.nums || []).join(', ')}. The greatest number gets to wear the ridiculous seaweed crown—just for today!`, 'Greater numbers sit farther to the right on a number line.'],
     twoStep: [`Milo collects ${data.start} shells, splashes up ${data.add} more, then trades ${data.take} for a shiny horn cap. He puts it on backward and calls it reef fashion!`, 'Solve in story order: first add, then subtract. Keep the result from step one.']
   };
-  const entry = stories[kind] || stories.count;
-  const [title, teach] = entry;
+  const [title, teach] = stories[kind];
   return { title, teach };
 }

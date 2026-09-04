@@ -35,7 +35,7 @@ app.innerHTML = `
 
     <section class="map-section" id="worlds" aria-labelledby="worldsTitle">
       <div class="section-head"><div><h2 id="worldsTitle">Choose a prehistoric world</h2><p>Each math world generates fresh randomized practice.</p></div><div class="difficulty" aria-label="Choose level"><button type="button" data-difficulty="kindergarten" aria-pressed="true">Kindergarten</button><button type="button" data-difficulty="easy" aria-pressed="false">Grade 1</button><button type="button" data-difficulty="medium" aria-pressed="false">Grade 2</button><button type="button" data-difficulty="hard" aria-pressed="false">Grade 3</button></div></div>
-      <details class="kindergarten-guide" id="kindergartenGuide" open><summary>All 20 Kindergarten challenges</summary><ol><li>Count dinos to 10 and count to 20</li><li>Recognize numbers 0–20</li><li>Match one dino to each count</li><li>Trace and write numbers 0–20</li><li>Compare more, less, or equal</li><li>Add dino eggs within 5</li><li>Subtract dinos within 5</li><li>Break apart numbers to 10</li><li>Make 10 with dino friends</li><li>Name 2D shapes</li><li>Sort by color, size, or type</li><li>Continue AB patterns</li><li>Compare length, height, and weight</li><li>Use position words</li><li>Explore 3D shapes</li><li>Count dino stomps by twos to 20</li><li>Put numbers 0–20 in order</li><li>Make equal groups; meet odd and even</li><li>Solve story problems within 10</li><li>Fill ten-frames with dino eggs</li></ol></details>
+      <details class="kindergarten-guide" id="kindergartenGuide" open><summary>All 21 Kindergarten challenges</summary><ol><li>Count dinos to 10 and count to 20</li><li>Recognize numbers 0–20</li><li>Match one dino to each count</li><li>Trace and write numbers 0–20</li><li>Compare more, less, or equal</li><li>Add dino eggs within 5</li><li>Subtract dinos within 5</li><li>Break apart numbers to 10</li><li>Make 10 with dino friends</li><li>Name 2D shapes</li><li>Sort by color, size, or type</li><li>Continue AB patterns</li><li>Compare length, height, and weight</li><li>Use position words</li><li>Explore 3D shapes</li><li>Count dino stomps by twos to 20</li><li>Put numbers 0–20 in order</li><li>Make equal groups; meet odd and even</li><li>Solve story problems within 10</li><li>Fill ten-frames with dino eggs</li><li>Say Coins: speak numbers 1-10 to flip coins and hear dino roars</li></ol></details>
       <div class="world-map" id="worldMap"></div>
     </section>
 
@@ -100,7 +100,264 @@ function renderBadges() {
   $('#badges').innerHTML = worlds.map((world, index) => `<div class="badge-item ${session.hasBadge(index) ? 'earned' : ''}"><strong>${session.hasBadge(index) ? '🏅' : '🥚'}</strong><span>${world.name.replace(/ (Valley|Volcano|Swamp|Jungle|Mountain|Canyon|Plains|Reef)/, '')}</span></div>`).join('');
 }
 
+let coinNumbers = [];
+let flippedSet = new Set();
+let coinRecognition = null;
+let coinRecognitionActive = false;
+let coinSpeechWanted = false;
+let coinRestartTimer = null;
+let coinPrivacyShown = false;
+
+const coinWordNumbers = {
+  zero: 0,
+  one: 1,
+  won: 1,
+  two: 2,
+  to: 2,
+  too: 2,
+  three: 3,
+  four: 4,
+  for: 4,
+  fore: 4,
+  five: 5,
+  six: 6,
+  seven: 7,
+  eight: 8,
+  ate: 8,
+  nine: 9,
+  ten: 10
+};
+
+function updateCoinProgress() {
+  const progress = $('#coinProgress');
+  if (progress) progress.textContent = `${flippedSet.size} of 10 coins flipped`;
+}
+
+function parseCoinNumber(transcript) {
+  const source = String(transcript || '').toLowerCase();
+  const words = source.match(/[a-z]+|\d+/g) || [];
+  const candidates = [];
+  words.forEach((word, index) => {
+    if (word !== 'number' || !words[index + 1]) return;
+    const nextWord = words[index + 1];
+    candidates.push(/^\d+$/.test(nextWord) ? Number(nextWord) : coinWordNumbers[nextWord]);
+  });
+  for (const match of source.matchAll(/\b(10|[1-9])\b/g)) candidates.push(Number(match[1]));
+  words.forEach((word) => candidates.push(coinWordNumbers[word]));
+  return candidates.find((value) => value >= 1 && value <= 10 && coinNumbers.includes(value) && !flippedSet.has(value)) ?? null;
+}
+
+function coinGameIsOpen() {
+  return state.problem?.skill === 'Say Coins' && game.classList.contains('active') && flippedSet.size < 10;
+}
+
+function setCoinListeningUI(listening) {
+  const button = $('#coinMicBtn');
+  if (!button) return;
+  button.classList.toggle('listening', listening);
+  button.setAttribute('aria-pressed', String(listening));
+  button.textContent = listening ? '⏹ Stop listening' : '🎙️ Tap to speak';
+}
+
+function stopCoinSpeech() {
+  const shouldStopRecognition = coinRecognition && (coinRecognitionActive || coinSpeechWanted);
+  coinSpeechWanted = false;
+  if (coinRestartTimer) {
+    window.clearTimeout(coinRestartTimer);
+    coinRestartTimer = null;
+  }
+  if (shouldStopRecognition) {
+    try { coinRecognition.stop(); } catch (error) { console.warn('Could not stop coin speech recognition', error); }
+  }
+  coinRecognitionActive = false;
+  setCoinListeningUI(false);
+}
+
+function finishCoinGame() {
+  if (state.answered) return;
+  state.answered = true;
+  stopCoinSpeech();
+  session.awardStar();
+  state.stars = session.state.stars;
+  state.roundCorrect = session.state.roundCorrect;
+  $('#quizWaiting').hidden = true;
+  $('#quizBody').hidden = false;
+  $('#readyBtn').disabled = true;
+  $('#readyBtn').textContent = 'All coins flipped! 🦖';
+  answers.querySelectorAll('button').forEach((button) => { button.disabled = true; });
+  feedback.className = 'feedback good';
+  feedback.textContent = 'All coins flipped! ROAR!';
+  $('#nextBtn').disabled = false;
+  $('#nextBtn').textContent = state.round === 3 ? 'See my badge →' : 'Next dino egg →';
+  updateProgress();
+}
+
+function flipCoin(number, element) {
+  if (!coinNumbers.includes(number) || flippedSet.has(number)) return;
+  const coin = element || document.querySelector(`.coin[data-number="${number}"]`);
+  if (!coin) return;
+  unlockAudio();
+  flippedSet.add(number);
+  coin.classList.add('flipped');
+  coin.disabled = true;
+  coin.setAttribute('aria-label', `Coin ${number} flipped`);
+  const matchingAnswer = answers.querySelector(`[data-answer="${number}"]`);
+  if (matchingAnswer) {
+    matchingAnswer.classList.add('correct');
+    matchingAnswer.disabled = true;
+  }
+  playWorldRoar(0);
+  playCorrectCelebration(0);
+  playEffect('pop');
+  celebrate();
+  updateCoinProgress();
+  const status = $('#coinStatus');
+  if (status) status.textContent = `Number ${number} flipped! Say another number.`;
+  if (flippedSet.size === 10) finishCoinGame();
+}
+
+function setupCoinSpeech() {
+  const micButton = $('#coinMicBtn');
+  const status = $('#coinStatus');
+  const privacy = $('#coinPrivacy');
+  if (!micButton) return;
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    coinRecognition = null;
+    micButton.disabled = true;
+    micButton.textContent = '🎙️ Voice unavailable';
+    micButton.setAttribute('aria-pressed', 'false');
+    if (status) status.textContent = 'Tap coins to flip!';
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+  coinRecognition = recognition;
+  recognition.lang = 'en-US';
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 3;
+
+  micButton.disabled = false;
+  micButton.textContent = '🎙️ Tap to speak';
+  micButton.setAttribute('aria-pressed', 'false');
+  if (status) status.textContent = 'Tap mic and say a number 1-10!';
+
+  const scheduleRestart = () => {
+    if (!coinSpeechWanted || !coinGameIsOpen() || coinRecognition !== recognition) return;
+    if (coinRestartTimer) window.clearTimeout(coinRestartTimer);
+    coinRestartTimer = window.setTimeout(() => {
+      coinRestartTimer = null;
+      if (!coinSpeechWanted || !coinGameIsOpen() || coinRecognition !== recognition) return;
+      try {
+        recognition.start();
+        if (status) status.textContent = 'Listening... say 1-10';
+      } catch (error) {
+        coinSpeechWanted = false;
+        setCoinListeningUI(false);
+        if (status) status.textContent = 'Mic could not start - tap coins to flip!';
+      }
+    }, 1000);
+  };
+
+  recognition.onstart = () => {
+    if (!coinSpeechWanted || coinRecognition !== recognition) {
+      try { recognition.stop(); } catch (error) { console.warn('Could not cancel coin speech recognition', error); }
+      return;
+    }
+    coinRecognitionActive = true;
+    setCoinListeningUI(true);
+  };
+
+  recognition.onresult = (event) => {
+    let matchedNumber = null;
+    let heard = '';
+    for (let resultIndex = event.resultIndex || 0; resultIndex < event.results.length && matchedNumber === null; resultIndex += 1) {
+      const result = event.results[resultIndex];
+      const alternativeCount = Math.min(result.length, recognition.maxAlternatives);
+      for (let alternativeIndex = 0; alternativeIndex < alternativeCount; alternativeIndex += 1) {
+        const transcript = result[alternativeIndex]?.transcript?.trim() || '';
+        if (!heard && transcript) heard = transcript;
+        const number = parseCoinNumber(transcript);
+        if (number !== null && coinNumbers.includes(number) && !flippedSet.has(number)) {
+          matchedNumber = number;
+          break;
+        }
+      }
+    }
+
+    if (matchedNumber !== null) {
+      flipCoin(matchedNumber);
+      if (status) status.textContent = `You said ${matchedNumber}! Flipped! 🦖`;
+    } else if (status) {
+      status.textContent = `I heard '${heard || 'something else'}' - try saying 1-10`;
+    }
+  };
+
+  recognition.onerror = (event) => {
+    coinRecognitionActive = false;
+    const permissionDenied = ['not-allowed', 'service-not-allowed', 'permission-denied'].includes(event.error);
+    if (permissionDenied) {
+      coinSpeechWanted = false;
+      setCoinListeningUI(false);
+      if (status) status.textContent = 'Mic blocked - tap coins to flip!';
+    } else if (event.error === 'audio-capture') {
+      coinSpeechWanted = false;
+      setCoinListeningUI(false);
+      if (status) status.textContent = 'Mic unavailable - tap coins to flip!';
+    } else if (event.error !== 'aborted' && status) {
+      status.textContent = event.error === 'no-speech'
+        ? 'I did not hear a number - try saying 1-10'
+        : 'Could not hear that - try saying 1-10';
+    }
+  };
+
+  recognition.onend = () => {
+    coinRecognitionActive = false;
+    scheduleRestart();
+  };
+
+  micButton.addEventListener('click', () => {
+    if (coinSpeechWanted) {
+      stopCoinSpeech();
+      if (status) status.textContent = 'Listening stopped. Tap mic or tap a coin!';
+      return;
+    }
+    unlockAudio();
+    coinSpeechWanted = true;
+    setCoinListeningUI(true);
+    if (!coinPrivacyShown && privacy) {
+      privacy.hidden = false;
+      coinPrivacyShown = true;
+    }
+    if (status) status.textContent = 'Listening... say 1-10';
+    try {
+      recognition.start();
+    } catch (error) {
+      coinSpeechWanted = false;
+      setCoinListeningUI(false);
+      if (status) status.textContent = 'Mic could not start - tap coins to flip!';
+    }
+  });
+}
+
+function initCoinGame() {
+  const grid = $('#coinGrid');
+  if (!grid) return;
+  stopCoinSpeech();
+  coinNumbers = Array.from({ length: 10 }, (_, index) => index + 1).sort(() => Math.random() - 0.5);
+  flippedSet = new Set();
+  coinPrivacyShown = false;
+  grid.innerHTML = coinNumbers.map((number) => `<button class="coin" type="button" data-number="${number}" aria-label="Flip coin ${number}"><span>${number}</span></button>`).join('');
+  grid.querySelectorAll('.coin').forEach((coin) => coin.addEventListener('click', () => flipCoin(Number(coin.dataset.number), coin)));
+  updateCoinProgress();
+  setupCoinSpeech();
+}
+
 function openPhonics() {
+  stopSpeaking();
+  stopCoinSpeech();
   game.classList.remove('active');
   phonicsWorldSection.classList.add('active');
   initAlphaBlocks(phonicsWorldSection, {
@@ -114,6 +371,8 @@ function openPhonics() {
 }
 
 function openWorld(index) {
+  stopSpeaking();
+  stopCoinSpeech();
   phonicsWorldSection.classList.remove('active');
   state.world = index;
   session.resetRound();
@@ -121,7 +380,7 @@ function openWorld(index) {
   document.documentElement.style.setProperty('--world', world.color);
   $('#gameDino').innerHTML = dinoImage(world);
   $('#gameTitle').textContent = world.name;
-  $('#gameSkills').textContent = `${state.difficulty === 'kindergarten' ? '20 Kindergarten math challenges' : world.skills} · ${world.roar}`;
+  $('#gameSkills').textContent = `${state.difficulty === 'kindergarten' ? '21 Kindergarten math challenges' : world.skills} · ${world.roar}`;
   game.classList.add('active');
   $('#playLayout').style.display = 'grid';
   $('#batchEnd').classList.remove('active');
@@ -131,6 +390,8 @@ function openWorld(index) {
 }
 
 function newProblem() {
+  stopSpeaking();
+  stopCoinSpeech();
   state.problem = makeProblem(state.world, state.difficulty);
   state.answered = false;
   const current = state.problem;
@@ -150,6 +411,7 @@ function newProblem() {
   $('#readyBtn').textContent = 'I see it — ask me! →';
   updateProgress();
   restartStoryAnimation();
+  if ($('#coinGrid')) initCoinGame();
 }
 
 function restartStoryAnimation() {
@@ -181,6 +443,10 @@ function revealQuestion() {
 function answerQuestion(button) {
   if (state.answered) return;
   unlockAudio();
+  if (state.problem?.skill === 'Say Coins') {
+    flipCoin(Number(button.dataset.answer));
+    return;
+  }
   const correct = isCorrectAnswer(state.problem, button.dataset.answer);
   if (correct) {
     state.answered = true;
@@ -205,6 +471,8 @@ function answerQuestion(button) {
 }
 
 function next() {
+  stopSpeaking();
+  stopCoinSpeech();
   state.round += 1;
   if (state.round >= 4) finishBatch();
   else newProblem();
@@ -228,6 +496,8 @@ function finishBatch() {
 }
 
 function more() {
+  stopSpeaking();
+  stopCoinSpeech();
   session.resetRound();
   $('#batchEnd').classList.remove('active');
   $('#playLayout').style.display = 'grid';
@@ -312,7 +582,7 @@ $('#storySpeakBtn').addEventListener('click', speakStory);
 $('#storyVoiceToggle').addEventListener('click', () => setStoryVoice(!state.storyVoice));
 $('#nextBtn').addEventListener('click', next);
 $('#moreBtn').addEventListener('click', more);
-$('#backBtn').addEventListener('click', () => { $('#worlds').scrollIntoView({ behavior: 'smooth', block: 'start' }); playEffect('pop'); });
+$('#backBtn').addEventListener('click', () => { stopSpeaking(); stopCoinSpeech(); $('#worlds').scrollIntoView({ behavior: 'smooth', block: 'start' }); playEffect('pop'); });
 $('#exploreBtn').addEventListener('click', () => $('#worlds').scrollIntoView({ behavior: 'smooth', block: 'start' }));
 $('#surpriseBtn').addEventListener('click', () => openWorld(rand(0, worlds.length - 1)));
 $('#soundToggle').addEventListener('click', (event) => {

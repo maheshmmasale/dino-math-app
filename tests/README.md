@@ -22,7 +22,7 @@ Coverage output is written to `coverage/`.
 
 ## Test layout
 
-- `unit/problems.test.js` — 20 Kindergarten challenges, repeated generation, level caps, and answer validation.
+- `unit/problems.test.js` — 21 Kindergarten challenges (including Say Coins), repeated generation, level caps, and answer validation.
 - `unit/worlds.test.js` — eight named worlds, dinosaur and grade mappings, story content, and image files.
 - `unit/curriculum.test.js` — Kindergarten–Grade 3 curriculum and standards metadata.
 - `unit/storage.test.js` — session stars, badges, and round progress. The public static app intentionally does not write child progress to browser persistence; progress resets on reload.

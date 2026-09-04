@@ -6,12 +6,6 @@ export default defineConfig({
     include: ['tests/unit/**/*.test.js'],
     clearMocks: true,
     restoreMocks: true,
-    pool: 'forks',
-    poolOptions: {
-      forks: {
-        singleFork: true
-      }
-    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
